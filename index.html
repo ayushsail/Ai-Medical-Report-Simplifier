@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimpleMed – AI Medical Report Simplifier</title>
+  <meta name="description" content="SimpleMed uses AI to translate complex medical reports into clear, easy-to-understand language in your preferred language." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="8" fill="url(#lg)"/>
+            <path d="M14 7v14M7 14h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#3b82f6"/><stop offset="1" stop-color="#6366f1"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo-text">Simple<span class="logo-accent">Med</span></span>
+      </div>
+      <div class="nav-badge">
+        <span class="badge-dot"></span>
+        AI Powered
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1 class="hero-title">Understand Your <span class="gradient-text">Medical Report</span></h1>
+    <p class="hero-sub">Upload your report and get a plain-language explanation instantly — in the language you choose.</p>
+  </section>
+
+  <!-- Main Tool -->
+  <main class="tool-wrap">
+    <div class="tool-grid">
+
+      <!-- LEFT: Upload Panel -->
+      <div class="card upload-card">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Upload Report
+        </div>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.webp" hidden />
+          <div id="dzDefault">
+            <div class="dz-icon-wrap">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="dz-main">Drag & drop or click to upload</p>
+            <p class="dz-sub">PDF · JPG · PNG · WEBP &nbsp;|&nbsp; Max 20 MB</p>
+          </div>
+          <div id="dzPreview" style="display:none;" class="dz-preview">
+            <span class="preview-icon" id="previewIcon"></span>
+            <div class="preview-meta">
+              <span class="preview-name" id="previewName"></span>
+              <span class="preview-size" id="previewSize"></span>
+            </div>
+            <button class="remove-btn" id="removeFile" title="Remove">✕</button>
+          </div>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="field-group">
+          <label class="field-label" for="langSelect">Output Language</label>
+          <div class="lang-grid" id="langGrid">
+            <button class="lang-btn active" data-lang="English">English</button>
+            <button class="lang-btn" data-lang="Hindi">हिंदी</button>
+            <button class="lang-btn" data-lang="Marathi">मराठी</button>
+            <button class="lang-btn" data-lang="Tamil">தமிழ்</button>
+            <button class="lang-btn" data-lang="Telugu">తెలుగు</button>
+            <button class="lang-btn" data-lang="Punjabi">ਪੰਜਾਬੀ</button>
+            <button class="lang-btn" data-lang="Kannada">ಕನ್ನಡ</button>
+            <button class="lang-btn" data-lang="Bengali">বাংলা</button>
+            <button class="lang-btn" data-lang="Gujarati">ગુજરાતી</button>
+            <button class="lang-btn" data-lang="Malayalam">മലയാളം</button>
+            <button class="lang-btn" data-lang="Urdu">اردو</button>
+            <button class="lang-btn" data-lang="Odia">ଓଡ଼ିଆ</button>
+          </div>
+        </div>
+
+
+        <!-- Analyze Button -->
+        <button class="analyze-btn" id="analyzeBtn" disabled>
+          <span id="btnLabel">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Analyze Report
+          </span>
+          <span id="btnLoader" style="display:none;">
+            <span class="spinner"></span> Processing…
+          </span>
+        </button>
+
+        <p class="privacy-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Your file is never stored permanently.
+        </p>
+      </div>
+
+      <!-- RIGHT: Output Panel -->
+      <div class="card output-card" id="outputCard">
+        <div class="card-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M7 7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-2M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Simplified Report
+          <div class="output-tools" id="outputTools" style="display:none;">
+            <button class="icon-btn" id="copyBtn" title="Copy">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2"/></svg>
+              Copy
+            </button>
+            <button class="icon-btn" id="downloadBtn" title="Download">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Download
+            </button>
+          </div>
+        </div>
+
+        <!-- States -->
+        <div class="output-state" id="stateEmpty">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M7 7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-2M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p class="state-title">No report yet</p>
+          <p class="state-sub">Upload a file and click Analyze to see results here.</p>
+        </div>
+
+        <div class="output-state" id="stateLoading" style="display:none;">
+          <div class="loading-spinner"></div>
+          <p class="state-title">AI is reading your report…</p>
+          <div class="loading-steps">
+            <div class="lstep" id="ls1">Extracting text from report</div>
+            <div class="lstep" id="ls2">Identifying medical terms</div>
+            <div class="lstep" id="ls3">Generating simplified summary</div>
+          </div>
+        </div>
+
+        <div class="output-state" id="stateError" style="display:none;">
+          <div class="error-icon">⚠</div>
+          <p class="state-title error-text">Analysis Failed</p>
+          <p class="state-sub" id="errorMsg">Check your Webhook URL and try again.</p>
+          <button class="retry-btn" id="retryBtn">Try Again</button>
+        </div>
+
+        <div class="output-content" id="outputContent" style="display:none;"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="disclaimer">⚠ SimpleMed is for informational purposes only. Always consult a qualified healthcare professional.</p>
+    <p class="footer-copy">© 2026 SimpleMed</p>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

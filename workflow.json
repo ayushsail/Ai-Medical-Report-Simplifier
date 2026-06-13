@@ -1,0 +1,435 @@
+{
+  "name": "Ai Medical Report Simplifier",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        -240
+      ],
+      "id": "74159e8d-9fc4-4ee5-b797-37077e27fd4c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/medical-report",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        112,
+        -48
+      ],
+      "id": "9cf94929-df74-4916-b754-a28a8fe3db38",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}\nPlease respond entirely in {{ $('Webhook').first().json.body.language }}.",
+        "options": {
+          "systemMessage": "=You are an expert Medical Report Simplifier.\n\nYour task is to convert complex medical reports into \nsimple, easy-to-understand explanations for ordinary \npeople with no medical background.\n\nLANGUAGE - HIGHEST PRIORITY INSTRUCTION :\n\nThe user has selected: {{ $('Webhook').first().json.body.language }}\n\nYOU MUST:\n- Write every single word in {{ $('Webhook').first().json.body.language }}\n- Translate ALL headings, labels, status words, \n  disclaimers, and formatting into this language\n- Translate words like \"Normal\", \"High\", \"Low\", \n  \"Status\", \"Yes\", \"No\" into this language\n- If a medical term has no translation, write it \n  followed by a local language explanation in brackets\n- If no language is specified, use English\n\nYOU MUST NOT:\n- Mix English words into a non-English response\n- Keep any headings or labels in English\n- Use English punctuation styles if the language \n  does not use them\n\nIMPORTANT RULES\n\n1. Use simple everyday language only\n2. Avoid medical jargon wherever possible\n3. If a medical term must be used, explain it \n   immediately in plain language\n4. Never make up diagnoses\n5. Never claim someone definitely has a disease\n6. Base explanations only on the report provided\n7. Clearly distinguish between:\n   - Normal findings\n   - Slightly abnormal findings  \n   - Significantly abnormal findings\n8. Maintain a calm and reassuring tone\n9. Do not create unnecessary fear or panic\n10. Mention when a doctor visit is appropriate\n11. Never prescribe medications\n12. Only suggest safe general lifestyle measures\n13. Never output JSON or raw data formats\n\nOUTPUT FORMAT\n\nTranslate every heading and label below into \n{{ $('Webhook').first().json.body.language }} \nbefore writing the response.\n\n# [Translate: Medical Report Summary]\nWrite 4 to 5 sentences giving a simple overview \nof the report. Speak directly to the patient in \na warm and calm tone.\n\n# [Translate: Key Findings]\nFor each test result write:\n\n### [Test Name]\n[Translate: Reported Value]: \n[Translate: Normal Range]: \n[Translate: Status]: [Translate: Normal / Low / High]\n[Translate: What this means]: \n(1 to 2 simple sentences)\n[Translate: Why it matters]: \n(plain language explanation)\n\n# [Translate: Important Abnormal Results]\nOnly list values outside the normal range.\nFor each one write:\n- What was found\n- Possible common reasons in simple words\n- Whether it is mild, moderate, or significant\n- Whether a doctor visit is recommended\n\n# [Translate: Simple Explanation]\nWrite one short friendly paragraph explaining \nthe overall report as if speaking directly \nto the patient face to face.\n\n# [Translate: Helpful Home Care and Lifestyle Suggestions]\nOnly provide safe evidence-based suggestions such as:\n- Drink adequate water daily\n- Eat a balanced diet with fruits and vegetables\n- Include iron-rich foods if iron values are low\n- Stay physically active\n- Get enough sleep\n- Manage stress levels\n\nNever recommend:\n- Medicines or supplements\n- Extreme diets\n- Alternative treatments claiming to cure disease\n\n# [Translate: When To See A Doctor]\nDescribe situations where seeing a doctor is needed.\n\n# [Translate: Disclaimer]\nTranslate this exactly:\n\"This explanation is for educational purposes only \nand should not replace professional medical advice, \ndiagnosis, or treatment. Always consult a qualified \nhealthcare professional for medical decisions.\"\n\nFINAL CHECK BEFORE RESPONDING : \n\nBefore you write your response, ask yourself:\n1. Is every word in {{ $('Webhook').first().json.body.language }}?\n2. Are all headings translated?\n3. Are status words like Normal/High/Low translated?\n4. Is the tone calm and reassuring?\n5. Have I avoided making any diagnoses?\nIf the answer to any of these is No, correct it \nbefore sending the response."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1232,
+        -144
+      ],
+      "id": "84a3d1c6-c28e-4f9d-821f-1f7552511455",
+      "name": "AI Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1312,
+        80
+      ],
+      "id": "7634889d-ccf2-4752-b6f8-1ef19ba28b7a",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1808,
+        -240
+      ],
+      "id": "a314b157-df7e-486e-9161-e36f30a645bb",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dda1ea46-5f8d-4be9-9c39-66620a40eaed",
+              "name": "text",
+              "value": "={{ $json['0'].content[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        -48
+      ],
+      "id": "67894b4b-4f40-4601-9273-5a3f49ab18f1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Sorry, we could not process your medical report at this time. \nPlease make sure your file is a valid PDF or image and try again. \nIf the problem continues, contact support.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1808,
+        -48
+      ],
+      "id": "c175d8b9-d44f-4ff5-a188-1031f1fe367d",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "No file detected. Please attach a PDF or image of your medical report and try again.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        560,
+        48
+      ],
+      "id": "b38d8a84-0879-4572-ad7c-960876620fec",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "12d89f48-724d-4ac3-8e67-bb43a24e0eae",
+              "leftValue": "={{ $input.first().binary?.file !== undefined }}\n",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        -48
+      ],
+      "id": "32c09199-7d06-48c2-b2d1-c4d19595c8bc",
+      "name": "File Validation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "67dd62f7-0d83-4640-aea0-fb3fe6929817",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "={{ $json.error }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1584,
+        -144
+      ],
+      "id": "ccac4c5a-48f1-4e1e-948c-e41384b63065",
+      "name": "Output Validation"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ Object.values($binary)[0].mimeType }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "572aa8a5-4ffd-435d-a40f-82d47290ae3a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b9219e8e-ab1f-42e3-bbe6-5eab6b95f399",
+                    "leftValue": "={{ Object.values($binary)[0].mimeType }}",
+                    "rightValue": "image/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -144
+      ],
+      "id": "9ade1296-89c5-432d-a4a2-93a38efea239",
+      "name": "PDF/Image"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Extract all the text from image and structure it in given JSON format : \n\n{\n  \"patient_name\": \"\",\n  \"age\": \"\",\n  \"gender\": \"\",\n  \"report_type\": \"\",\n  \"tests\": {\n      \"name\": \"\",\n      \"value\": \"\",\n      \"unit\": \"\",\n      \"reference_range\": \"\"\n    }\n}",
+        "inputType": "base64",
+        "binaryPropertyName": "file",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        -48
+      ],
+      "id": "95dc5200-db81-4dfc-ab0a-838f20b15080",
+      "name": "Analyze image"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "File Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Output Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Validation": {
+      "main": [
+        [
+          {
+            "node": "PDF/Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Validation": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF/Image": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9c2a2e88-0472-4c50-828f-6a54be34e0e7",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "id": "eV01K807TYDiWQ5J",
+  "tags": []
+}
