@@ -23,7 +23,6 @@ Medical reports are often filled with technical terms, abbreviations, and number
 - **AI-Powered Simplification** — Uses GPT-4o to translate medical jargon into plain language
 - **Structured Output** — Includes a summary, key findings, abnormal results, lifestyle suggestions, and a "when to see a doctor" section
 - **Multilingual Support** — Get results in English, Hindi, Marathi, Tamil, Telugu, Punjabi, Kannada, Bengali, Gujarati, Malayalam, Urdu, or Odia
-- **Text-to-Speech** — Listen to the simplified report using the browser's built-in speech synthesis, with play/pause/resume controls
 - **Smart Routing** — Automatically detects whether the uploaded file is a PDF or an image and processes it accordingly
 - **Error Handling** — Friendly fallback messages if file validation or AI processing fails
 - **Copy & Download** — Easily copy the result to clipboard or download it as a text file
@@ -83,7 +82,6 @@ to frontend       error message
 | Workflow Engine  | n8n (cloud or self-hosted)            |
 | AI Model         | OpenAI GPT-4o / GPT-4o-mini           |
 | File Handling    | n8n Extract from File, OpenAI Vision  |
-| Text-to-Speech   | Browser SpeechSynthesis API           |
 
 ---
 
@@ -156,7 +154,7 @@ SimpleMed is intended for **informational and educational purposes only**. It do
 
 - Follow-up Q&A chat based on the uploaded report
 - Report history and trend tracking across multiple uploads
-- Cloud-based text-to-speech for consistent multilingual audio support
+- Text-to-speech support for listening to simplified reports
 - PDF export of the simplified report
 
 ---
