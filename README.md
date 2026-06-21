@@ -159,6 +159,4 @@ SimpleMed is intended for **informational and educational purposes only**. It do
 
 ---
 
-## License
-
-This project is open-source and available for personal and educational use.
+*Built with passion by [Ayush Sail](https://github.com/ayushsail)*
